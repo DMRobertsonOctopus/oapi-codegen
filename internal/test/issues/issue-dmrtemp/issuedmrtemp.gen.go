@@ -16,8 +16,8 @@ import (
 
 // GetRootParams defines parameters for GetRoot.
 type GetRootParams struct {
-	Id   *string  `form:"id,omitempty" json:"id,omitempty"`
-	Tags []string `form:"tags,omitempty" json:"tags,omitempty"`
+	Id   *string   `form:"id,omitempty" json:"id,omitempty"`
+	Tags *[]string `form:"tags,omitempty" json:"tags,omitempty"`
 }
 
 // RequestEditorFn  is the function signature for the RequestEditor callback function
@@ -147,16 +147,20 @@ func NewGetRootRequest(server string, params *GetRootParams) (*http.Request, err
 
 		}
 
-		if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tags", runtime.ParamLocationQuery, params.Tags); err != nil {
-			return nil, err
-		} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
-			return nil, err
-		} else {
-			for k, v := range parsed {
-				for _, v2 := range v {
-					queryValues.Add(k, v2)
+		if params.Tags != nil {
+
+			if queryFrag, err := runtime.StyleParamWithLocation("form", true, "tags", runtime.ParamLocationQuery, params.Tags); err != nil {
+				return nil, err
+			} else if parsed, err := url.ParseQuery(queryFrag); err != nil {
+				return nil, err
+			} else {
+				for k, v := range parsed {
+					for _, v2 := range v {
+						queryValues.Add(k, v2)
+					}
 				}
 			}
+
 		}
 
 		queryURL.RawQuery = queryValues.Encode()
